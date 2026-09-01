@@ -5,8 +5,8 @@
   "url": "/archive/week36_v5_20260901.json",
   "stats": {
     "github": {
-      "count": 20,
-      "stars": 7630
+      "count": 14,
+      "stars": 0
     },
     "harness": {
       "count": 20
@@ -15,29 +15,29 @@
       "count": 10
     },
     "audit": {
-      "total": 40
+      "total": 34
     }
   },
   "sections": {
     "foundation": {
       "name": "🏗️ 智能基座",
-      "count": 4,
-      "stars": 2100
+      "count": 5,
+      "stars": 0
     },
     "skills": {
       "name": "🛠️ 技能工坊",
-      "count": 5,
-      "stars": 2500
+      "count": 7,
+      "stars": 0
     },
     "applications": {
       "name": "📦 应用百宝箱",
-      "count": 5,
-      "stars": 2330
+      "count": 1,
+      "stars": 0
     },
     "inspire": {
       "name": "💡 灵感仓库",
-      "count": 6,
-      "stars": 700
+      "count": 1,
+      "stars": 0
     }
   }
 }
