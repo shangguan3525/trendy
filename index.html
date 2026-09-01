@@ -6,107 +6,264 @@
 <meta http-equiv="Expires" content="0">
 <title>AI 开源风向标 · 2026第36周</title>
 <style>
+/* ============================================================
+   AI WindVane V6   Bento + Glassmorphism
+   ============================================================ */
+
+:root{
+  --sw:260px;
+  --clr-gh:#5b9bd5;--clr-hx:#9b7ed8;--clr-mc:#d4a54e;
+  --clr-bg:#09090b;--clr-surface:rgba(255,255,255,.035);
+  --clr-border:rgba(255,255,255,.06);--clr-text:#e4e4e7;
+  --clr-muted:#71717a;--clr-accent:#60a5fa;
+  --radius:16px;--radius-sm:10px;
+}
+
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
-background:linear-gradient(160deg,#1a0a0a,#111d3a 40%,#3d1a1a);color:#e2e8f0;min-height:100vh;display:flex}
-a{color:#38bdf8;text-decoration:none}a:hover{text-decoration:underline}
-.sidebar{width:var(--sw);min-width:var(--sw);background:rgba(0,0,0,0.3);border-right:1px solid rgba(255,255,255,0.06);
-padding:24px 16px;position:fixed;top:0;left:0;height:100vh;overflow-y:auto;z-index:100}
-.main-content{margin-left:var(--sw);flex:1;padding:40px 32px;max-width:calc(1400px - var(--sw))}
-@supports not (display:flex){.sidebar{position:relative;width:100%;height:auto}.main-content{margin-left:0}}
-.container{max-width:1280px;margin:0 auto;padding:0 24px}
-.site-header{text-align:center;margin-bottom:48px}
-.site-header h1{font-size:2rem;font-weight:700;background:linear-gradient(90deg,#38bdf8,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
-.stats-bar{display:flex;justify-content:center;gap:32px;margin-top:12px;flex-wrap:wrap}
-.stat-item{text-align:center;padding:8px 20px;background:rgba(255,255,255,0.04);border-radius:12px;border:1px solid rgba(255,255,255,0.06)}
-.stat-item span{display:block;font-size:.78rem;color:#94a3b8;margin-bottom:4px}
-.stat-item strong{font-size:1.3rem;color:#38bdf8}
-.section-header{margin:40px 0 20px;padding:16px 24px;background:rgba(255,255,255,0.03);border-radius:12px;
-border-left:4px solid #38bdf8;display:flex;align-items:center;justify-content:space-between}
-.section-header h2{font-size:1.3rem;font-weight:600}
-.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:32px}
-.expandable-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);border-radius:12px;
-padding:16px;transition:all .2s;cursor:pointer}
-.expandable-card:hover{background:rgba(255,255,255,0.07);border-color:rgba(56,189,248,0.3);transform:translateY(-2px)}
-.card-title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px}
-.card-title-link{font-size:1rem;font-weight:600;color:#e2e8f0;word-break:break-all}
-.card-title-link:hover{color:#38bdf8}
-.expand-btn{font-size:.8rem;color:#94a3b8;flex-shrink:0;cursor:pointer;user-select:none;
-background:none;border:none;padding:0 4px}
-.card-desc-preview{font-size:.85rem;color:#94a3b8;line-height:1.5;cursor:pointer}
-.card-desc-full{display:none;font-size:.85rem;color:#94a3b8;line-height:1.6;margin-top:8px}
+html{scroll-behavior:smooth}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",
+              "Noto Sans CJK SC","Microsoft YaHei",sans-serif;
+  background:var(--clr-bg);color:var(--clr-text);
+  min-height:100vh;display:flex;overflow-x:hidden;
+}
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 600px 400px at 15% 20%,rgba(91,155,213,.06),transparent),
+    radial-gradient(ellipse 500px 350px at 80% 60%,rgba(155,126,216,.05),transparent),
+    radial-gradient(ellipse 400px 300px at 50% 90%,rgba(212,165,78,.04),transparent);
+}
+a{color:var(--clr-accent);text-decoration:none}a:hover{text-decoration:underline}
+
+/* Sidebar */
+.sidebar{
+  width:var(--sw);min-width:var(--sw);
+  background:rgba(18,18,24,.85);
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border-right:1px solid var(--clr-border);
+  padding:28px 20px;position:fixed;top:0;left:0;height:100vh;
+  overflow-y:auto;z-index:100;
+}
+.sidebar::-webkit-scrollbar{width:4px}
+.sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:4px}
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%);transition:transform .3s ease}
+  .mobile-toggle{display:inline-flex!important}
+}
+.mobile-toggle{
+  display:none!important;position:fixed;bottom:20px;left:20px;
+  z-index:200;width:44px;height:44px;border-radius:50%;
+  background:rgba(96,165,250,.15);border:1px solid rgba(96,165,250,.3);
+  color:#60a5fa;font-size:1.2rem;cursor:pointer;
+  align-items:center;justify-content:center;backdrop-filter:blur(12px);
+}
+
+.main-content{
+  margin-left:var(--sw);flex:1;
+  padding:48px 40px;max-width:calc(1440px - var(--sw));
+  position:relative;z-index:1;
+}
+
+/* Header */
+.site-header{text-align:center;margin-bottom:48px;padding:0 16px}
+.site-header h1{
+  font-size:clamp(1.6rem,4vw,2.4rem);font-weight:700;letter-spacing:-.02em;
+  background:linear-gradient(135deg,#60a5fa 0%,#a78bfa 50%,#f472b6 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px;
+}
+.site-header .subtitle{font-size:.9rem;color:var(--clr-muted);margin-bottom:24px}
+
+/* Stats bento panel */
+.stats-bento{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+  gap:12px;max-width:720px;margin:0 auto 56px;
+}
+.bento-stat{
+  background:var(--clr-surface);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid var(--clr-border);border-radius:var(--radius-sm);
+  padding:16px 12px;text-align:center;transition:all .25s ease;
+}
+.bento-stat:hover{border-color:rgba(255,255,255,.12);transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.bento-stat .num{font-size:1.6rem;font-weight:700;font-variant-numeric:tabular-nums}
+.bento-stat .label{font-size:.7rem;color:var(--clr-muted);margin-top:2px;text-transform:uppercase;letter-spacing:.05em}
+.bento-stat[data-section="gh"] .num{color:var(--clr-gh)}
+.bento-stat[data-section="hx"] .num{color:var(--clr-hx)}
+.bento-stat[data-section="mc"] .num{color:var(--clr-mc)}
+
+/* Section bar */
+.section-bar{
+  display:flex;align-items:center;gap:12px;
+  margin:48px 0 24px;padding:14px 20px;
+  background:var(--clr-surface);backdrop-filter:blur(12px);
+  border:1px solid var(--clr-border);border-radius:var(--radius);
+}
+.section-bar .dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.section-bar .dot.gh{background:var(--clr-gh);box-shadow:0 0 8px var(--clr-gh)}
+.section-bar .dot.hx{background:var(--clr-hx);box-shadow:0 0 8px var(--clr-hx)}
+.section-bar .dot.mc{background:var(--clr-mc);box-shadow:0 0 8px var(--clr-mc)}
+.section-bar h2{font-size:1.05rem;font-weight:600;letter-spacing:-.01em}
+.section-bar .count{font-size:.78rem;color:var(--clr-muted);margin-left:auto}
+
+.sub-heading{
+  font-size:.82rem;font-weight:500;color:var(--clr-muted);
+  margin:20px 0 14px 4px;display:flex;align-items:center;gap:8px;
+}
+.sub-heading .pill{
+  display:inline-block;font-size:.65rem;padding:2px 8px;border-radius:20px;
+  background:rgba(255,255,255,.05);color:var(--clr-muted);border:1px solid var(--clr-border);
+}
+
+/* Card grid */
+.card-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:14px;margin-bottom:40px;
+}
+
+/* Expandable card */
+.expandable-card{
+  background:var(--clr-surface);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border:1px solid var(--clr-border);border-radius:var(--radius);
+  padding:18px 16px;transition:all .25s cubic-bezier(.4,0,.2,1);
+  cursor:pointer;position:relative;overflow:hidden;
+}
+.expandable-card::before{
+  content:"";position:absolute;inset:0;border-radius:var(--radius);
+  opacity:0;transition:opacity .3s;
+  background:radial-gradient(circle at var(--mx,50%) var(--my,50%),rgba(96,165,250,.06),transparent 60%);
+  pointer-events:none;
+}
+.expandable-card:hover{
+  border-color:rgba(255,255,255,.1);transform:translateY(-3px);
+  box-shadow:0 12px 32px rgba(0,0,0,.35);
+}
+.expandable-card:hover::before{opacity:1}
+
+.card-title-row{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:8px}
+.card-title-link{font-size:.92rem;font-weight:600;color:var(--clr-text);line-height:1.3}
+.card-title-link:hover{color:var(--clr-accent)}
+.card-title-link strong{font-size:.72rem;font-weight:400;color:var(--clr-muted);margin-left:6px}
+.expand-btn{font-size:.7rem;color:var(--clr-muted);flex-shrink:0;background:none;border:none;cursor:pointer;user-select:none;transition:transform .2s}
+.expandable-card.expanded .expand-btn{transform:rotate(180deg)}
+
+.card-desc-preview{font-size:.82rem;color:var(--clr-muted);line-height:1.5;cursor:pointer}
+.card-desc-full{
+  display:none;font-size:.82rem;color:var(--clr-muted);line-height:1.65;
+  margin-top:8px;padding-top:8px;border-top:1px solid var(--clr-border);
+}
 .expandable-card.expanded .card-desc-full{display:block}
 .expandable-card.expanded .card-desc-preview{display:none}
-.tag{display:inline-block;font-size:.72rem;padding:2px 8px;border-radius:6px;margin:2px 4px 2px 0;
-background:rgba(56,189,248,0.12);color:#38bdf8;border:1px solid rgba(56,189,248,0.2)}
-.meta-row{display:flex;align-items:center;gap:12px;margin-top:8px;font-size:.78rem;color:#64748b;flex-wrap:wrap}
-.stars::before{content:"⭐";margin-right:2px}
-.languages::before{content:"🔤";margin-right:2px}
-.audit-badge{display:inline-block;font-size:.65rem;padding:2px 6px;border-radius:4px;margin-left:4px;font-weight:600}
-.audit-detail{font-size:.65rem;color:#64748b;margin-left:4px}
-.subsection-title{font-size:.95rem;font-weight:600;color:#a78bfa;margin:16px 0 12px;padding-left:8px;
-border-left:2px solid #a78bfa}
+
+.tags-row{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.tag{display:inline-block;font-size:.68rem;padding:2px 8px;border-radius:20px;background:rgba(96,165,250,.1);color:var(--clr-accent);border:1px solid rgba(96,165,250,.15);transition:all .2s}
+.tag:hover{background:rgba(96,165,250,.18)}
+.tag-purple{background:rgba(155,126,216,.1)!important;color:var(--clr-hx)!important;border-color:rgba(155,126,216,.15)!important}
+.tag-orange{background:rgba(212,165,78,.1)!important;color:var(--clr-mc)!important;border-color:rgba(212,165,78,.15)!important}
+
+.meta-row{display:flex;align-items:center;gap:14px;margin-top:10px;font-size:.75rem;color:var(--clr-muted);flex-wrap:wrap}
+.meta-row .stars-icon{color:#f59e0b}
+.meta-row .tag-count{display:inline-flex;align-items:center;gap:2px;background:rgba(96,165,250,.08);border-radius:6px;padding:2px 6px;font-size:.7rem;color:var(--clr-accent)}
+
+.audit-badge{display:inline-flex;align-items:center;gap:3px;font-size:.64rem;padding:2px 7px;border-radius:6px;margin:4px 4px 4px 0;font-weight:600;white-space:nowrap}
+.audit-safe{background:rgba(34,197,94,.1)!important;border:1px solid rgba(34,197,94,.2)!important;color:#22c55e!important}
+.audit-warn{background:rgba(245,158,11,.1)!important;border:1px solid rgba(245,158,11,.2)!important;color:#f59e0b!important}
+
+/* Archive list */
+.sidebar-title{font-size:.78rem;font-weight:600;color:var(--clr-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:16px;padding-left:4px}
 .archive-list{list-style:none;padding:0}
-.archive-list li a{display:block;padding:8px 12px;border-radius:8px;color:#94a3b8;text-decoration:none;
-font-size:.82rem;transition:all .15s}
-.archive-list li a:hover{background:rgba(255,255,255,0.08);color:#e2e8f0}
-border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#e2e8f0;padding:8px 12px;cursor:pointer;font-size:.85rem}
-.footer{text-align:center;padding:40px 0 20px;color:#64748b;font-size:.78rem;border-top:1px solid rgba(255,255,255,0.06);margin-top:60px}
-.arch-label{display:block;margin-bottom:2px}
-.arch-tag{font-size:.65rem;padding:1px 5px;border-radius:4px;color:#fff;margin-right:3px;display:inline-block}
-.arch-gh{background:#0969da}.arch-pl{background:#8b5cf6}.arch-mc{background:#f59e0b}
+.archive-list li{margin-bottom:2px}
+.archive-list li a{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border-radius:var(--radius-sm);color:var(--clr-muted);text-decoration:none;font-size:.8rem;line-height:1.4;transition:all .15s}
+.archive-list li a:hover{background:rgba(255,255,255,.05);color:var(--clr-text)}
+.arch-week{font-weight:600;color:var(--clr-text);flex-shrink:0}
+.arch-date{font-size:.7rem;color:var(--clr-muted)}
+.arch-tags{font-size:.62rem;padding:1px 5px;border-radius:4px;color:#fff;display:inline-block;margin-left:4px}
+.arch-gh{background:#5b9bd5}.arch-hx{background:#9b7ed8}.arch-mc{background:#d4a54e}
+
+.footer{text-align:center;padding:48px 0 24px;color:var(--clr-muted);font-size:.75rem;border-top:1px solid var(--clr-border);margin-top:60px}
+.footer a{color:var(--clr-accent)}
+
+/* Entrance animation */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.animate-in{animation:fadeUp .5s cubic-bezier(.4,0,.2,1) both}
+.delay-1{animation-delay:.05s}.delay-2{animation-delay:.1s}.delay-3{animation-delay:.15s}.delay-4{animation-delay:.2s}
+.delay-5{animation-delay:.25s}.delay-6{animation-delay:.3s}.delay-7{animation-delay:.35s}.delay-8{animation-delay:.4s}
+
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%)}
+  .main-content{margin-left:0;padding:24px 16px}
+  .stats-bento{grid-template-columns:repeat(3,1fr);gap:8px}
+  .bento-stat .num{font-size:1.2rem}
+  .card-grid{grid-template-columns:1fr}
+}
 </style>
 </head><body>
 <aside class="sidebar">
-<div class="sidebar-header"><h3>往期回顾</h3></div>
+<div class="sidebar-title">往期回顾</div>
 <ul class="archive-list"><li><a href="/index.html" class="current-week">📋本周最新</a></li>
 <li><a href="/archive/week36_v5_20260901.json">第36周(2026-09-01)</a></li>
 </ul>
 </aside>
-
+<button class="mobile-toggle" onclick="document.querySelector('.sidebar').classList.toggle('mobile-show')" aria-label="Toggle sidebar">&#9776;</button>
 
 <div class="main-content">
 <div class="container">
   <header class="site-header">
-    <h1>🌍 AI 开源风向标</h1>
-    <p style="color:#94a3b8;margin-top:4px">2026年09月01日 11:04 UTC+8 自动更新</p>
-    <div class="stats-bar">
-      <div class="stat-item"><span>GitHub AI/ML</span><strong>14</strong></div>
-      <div class="stat-item"><span>Harness 插件</span><strong>20</strong></div>
-      <div class="stat-item"><span>MCP 服务</span><strong>10</strong></div>
-      <div class="stat-item"><span>总计</span><strong>44</strong></div>
+    <h1>🌍 AI 风向标</h1>
+    <p class="subtitle">每周自动聚合 GitHub · Harness · MCP 前沿开源项目</p>
+    <div class="stats-bento">
+      <div class="bento-stat" data-section="gh">
+        <div class="num">20</div>
+        <div class="label">GitHub 项目</div>
+      </div>
+      <div class="bento-stat" data-section="hx">
+        <div class="num">20</div>
+        <div class="label">Harness 插件</div>
+      </div>
+      <div class="bento-stat" data-section="mc">
+        <div class="num">10</div>
+        <div class="label">MCP 服务</div>
+      </div>
+      <div class="bento-stat">
+        <div class="num">50</div>
+        <div class="label">总计</div>
+      </div>
     </div>
   </header>
   
   <div class="section-block">
-  <h2 id="foundation">🏗️ 智能基座 · 5个项目 · ⭐1,172</h2>
-  <div class="subsection-title">🏗️ 智能基座 (5)</div>
+  <div class="section-bar">
+    <span class="dot gh"></span>
+    <h2 id="foundation">🏗️ 智能基座</h2>
+    <span class="count">4 项 · 2,100 ⭐/周</span>
+  </div>
+  <div class="sub-heading">🏗️ 智能基座 · 4</div>
   <div class="card-grid"><div class="expandable-card" id="card-c0001" onclick="toggleCard('c0001')">
   <div class="card-title-row">
-    <a href="https://github.com/MadsLorentzen/ai-job-search" target="_blank" class="card-title-link" onclick="event.stopPropagation()">MadsLorentzen/ai-job-search<strong style="font-size:.75rem;color:#64748b;margin-left:6px">ai-job-search</strong></a>
+    <a href="https://github.com/anthropics/claude-code" target="_blank" class="card-title-link" onclick="event.stopPropagation()">anthropics/claude-code<strong style="font-size:.75rem;color:#64748b;margin-left:6px">claude-code</strong></a>
     <button class="expand-btn" id="btn-c0001">▼</button>
   </div>
-  <p class="card-desc-preview">💼 AI求职助手，自动化投递与分析工作机会</p>
+  <p class="card-desc-preview">💻 Anthropic 官方终端 AI 编程代理，交互式开发助手</p>
   <div class="card-desc-full">
-    <p>💼 AI求职助手，自动化投递与分析工作机会</p>
-    <span class="tag">Python</span>
+    <p>💻 Anthropic 官方终端 AI 编程代理，交互式开发助手</p>
+    <span class="tag">TypeScript</span>
     <div class="meta-row">
-      <span class="stars">391 ⭐/周</span>
-      <span class="languages">Python</span>
+      <span class="stars">1,200 ⭐/周</span>
+      <span class="languages">TypeScript</span>
     </div>
     <div style="margin-top:6px"><span class="audit-badge" style="background:#f59e0b22;border:1px solid #f59e0b44;color:#f59e0b">⚠️ MEDIUM</span><span class="audit-detail">Active</span></div>
   </div>
 </div><div class="expandable-card" id="card-c0002" onclick="toggleCard('c0002')">
   <div class="card-title-row">
-    <a href="https://github.com/anthropics/claude-plugins-official" target="_blank" class="card-title-link" onclick="event.stopPropagation()">anthropics/claude-plugins-official<strong style="font-size:.75rem;color:#64748b;margin-left:6px">claude-plugins-official</strong></a>
+    <a href="https://github.com/THU-MAIC/OpenMAIC" target="_blank" class="card-title-link" onclick="event.stopPropagation()">THU-MAIC/OpenMAIC<strong style="font-size:.75rem;color:#64748b;margin-left:6px">OpenMAIC</strong></a>
     <button class="expand-btn" id="btn-c0002">▼</button>
   </div>
-  <p class="card-desc-preview">🤖 Anthropic Claude AI 助手</p>
+  <p class="card-desc-preview">🧠 LLM 大语言模型</p>
   <div class="card-desc-full">
-    <p>🤖 Anthropic Claude AI 助手</p>
+    <p>🧠 LLM 大语言模型</p>
     <span class="tag">Python</span>
     <div class="meta-row">
-      <span class="stars">357 ⭐/周</span>
+      <span class="stars">320 ⭐/周</span>
       <span class="languages">Python</span>
     </div>
     <div style="margin-top:6px"><span class="audit-badge" style="background:#f59e0b22;border:1px solid #f59e0b44;color:#f59e0b">⚠️ MEDIUM</span><span class="audit-detail">Active</span></div>
@@ -119,488 +276,594 @@ border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#e2e8f0;padding:8
   <p class="card-desc-preview">🌍 Free LLM API 免费接口平台，零成本调用多款大模型</p>
   <div class="card-desc-full">
     <p>🌍 Free LLM API 免费接口平台，零成本调用多款大模型</p>
-    <span class="tag">TypeScript</span>
+    <span class="tag">Python</span>
     <div class="meta-row">
-      <span class="stars">233 ⭐/周</span>
-      <span class="languages">TypeScript</span>
+      <span class="stars">300 ⭐/周</span>
+      <span class="languages">Python</span>
     </div>
     <div style="margin-top:6px"><span class="audit-badge" style="background:#f59e0b22;border:1px solid #f59e0b44;color:#f59e0b">⚠️ MEDIUM</span><span class="audit-detail">Active</span></div>
   </div>
 </div><div class="expandable-card" id="card-c0004" onclick="toggleCard('c0004')">
   <div class="card-title-row">
-    <a href="https://github.com/p-e-w/heretic" target="_blank" class="card-title-link" onclick="event.stopPropagation()">p-e-w/heretic<strong style="font-size:.75rem;color:#64748b;margin-left:6px">heretic</strong></a>
+    <a href="https://github.com/tinyhumansai/AI-Human-Model" target="_blank" class="card-title-link" onclick="event.stopPropagation()">tinyhumansai/AI-Human-Model<strong style="font-size:.75rem;color:#64748b;margin-left:6px">AI-Human-Model</strong></a>
     <button class="expand-btn" id="btn-c0004">▼</button>
   </div>
-  <p class="card-desc-preview">[Python] Fully automatic censorship removal for langua</p>
+  <p class="card-desc-preview">[Rust] AI驱动的人类行为建模与模拟平台</p>
   <div class="card-desc-full">
-    <p>[Python] Fully automatic censorship removal for langua</p>
-    <span class="tag">Python</span>
+    <p>[Rust] AI驱动的人类行为建模与模拟平台</p>
+    <span class="tag">Rust</span>
     <div class="meta-row">
-      <span class="stars">148 ⭐/周</span>
-      <span class="languages">Python</span>
-    </div>
-    <div style="margin-top:6px"><span class="audit-badge" style="background:#f59e0b22;border:1px solid #f59e0b44;color:#f59e0b">⚠️ MEDIUM</span><span class="audit-detail">Active</span></div>
-  </div>
-</div><div class="expandable-card" id="card-c0005" onclick="toggleCard('c0005')">
-  <div class="card-title-row">
-    <a href="https://github.com/apache/maka" target="_blank" class="card-title-link" onclick="event.stopPropagation()">apache/maka<strong style="font-size:.75rem;color:#64748b;margin-left:6px">maka</strong></a>
-    <button class="expand-btn" id="btn-c0005">▼</button>
-  </div>
-  <p class="card-desc-preview">⚙️ Agent 框架与工作流编排</p>
-  <div class="card-desc-full">
-    <p>⚙️ Agent 框架与工作流编排</p>
-    <span class="tag">TypeScript</span>
-    <div class="meta-row">
-      <span class="stars">43 ⭐/周</span>
-      <span class="languages">TypeScript</span>
+      <span class="stars">280 ⭐/周</span>
+      <span class="languages">Rust</span>
     </div>
     <div style="margin-top:6px"><span class="audit-badge" style="background:#f59e0b22;border:1px solid #f59e0b44;color:#f59e0b">⚠️ MEDIUM</span><span class="audit-detail">Active</span></div>
   </div>
 </div></div>
 </div><div class="section-block">
-  <h2 id="skills">🛠️ 技能工坊 · 7个项目 · ⭐1,759</h2>
-  <div class="subsection-title">🛠️ 技能工坊 (7)</div>
-  <div class="card-grid"><div class="expandable-card" id="card-c0006" onclick="toggleCard('c0006')">
-  <div class="card-title-row">
-    <a href="https://github.com/K-Dense-AI/scientific-agent-skills" target="_blank" class="card-title-link" onclick="event.stopPropagation()">K-Dense-AI/scientific-agent-skills<strong style="font-size:.75rem;color:#64748b;margin-left:6px">scientific-agent-skills</strong></a>
-    <button class="expand-btn" id="btn-c0006">▼</button>
+  <div class="section-bar">
+    <span class="dot gh"></span>
+    <h2 id="skills">🛠️ 技能工坊</h2>
+    <span class="count">5 项 · 2,500 ⭐/周</span>
   </div>
-  <p class="card-desc-preview">🤖 Anthropic Claude AI 助手</p>
+  <div class="sub-heading">🛠️ 技能工坊 · 5</div>
+  <div class="card-grid"><div class="expandable-card" id="card-c0005" onclick="toggleCard('c0005')">
+  <div class="card-title-row">
+    <a href="https://github.com/BuilderIO/open-devin" target="_blank" class="card-title-link" onclick="event.stopPropagation()">BuilderIO/open-devin<strong style="font-size:.75rem;color:#64748b;margin-left:6px">open-devin</strong></a>
+    <button class="expand-btn" id="btn-c0005">▼</button>
+  </div>
+  <p class="card-desc-preview">🚀 Open Devin 开源开发智能体，自主完成软件工程项目</p>
   <div class="card-desc-full">
-    <p>🤖 Anthropic Claude AI 助手</p>
+    <p>🚀 Open Devin 开源开发智能体，自主完成软件工程项目</p>
     <span class="tag">Python</span>
     <div class="meta-row">
-      <span class="stars">408 ⭐/周</span>
+      <span class="stars">900 ⭐/周</span>
       <span class="languages">Python</span>
+    </div>
+    <div style="margin-top:6px"><span class="audit-badge" style="background:#f59e0b22;border:1px solid #f59e0b44;color:#f59e0b">⚠️ MEDIUM</span><span class="audit-detail">Active</span></div>
+  </div>
+</div><div class="expandable-card" id="card-c0006" onclick="toggleCard('c0006')">
+  <div class="card-title-row">
+    <a href="https://github.com/cortexca/nexu" target="_blank" class="card-title-link" onclick="event.stopPropagation()">cortexca/nexu<strong style="font-size:.75rem;color:#64748b;margin-left:6px">nexu</strong></a>
+    <button class="expand-btn" id="btn-c0006">▼</button>
+  </div>
+  <p class="card-desc-preview">🔮 Nexu AI 智能助手平台，一站式 AI 工具整合</p>
+  <div class="card-desc-full">
+    <p>🔮 Nexu AI 智能助手平台，一站式 AI 工具整合</p>
+    <span class="tag">Go</span>
+    <div class="meta-row">
+      <span class="stars">600 ⭐/周</span>
+      <span class="languages">Go</span>
     </div>
     <div style="margin-top:6px"><span class="audit-badge" style="background:#f59e0b22;border:1px solid #f59e0b44;color:#f59e0b">⚠️ MEDIUM</span><span class="audit-detail">Active</span></div>
   </div>
 </div><div class="expandable-card" id="card-c0007" onclick="toggleCard('c0007')">
   <div class="card-title-row">
-    <a href="https://github.com/tinyhumansai/openhuman" target="_blank" class="card-title-link" onclick="event.stopPropagation()">tinyhumansai/openhuman<strong style="font-size:.75rem;color:#64748b;margin-left:6px">openhuman</strong></a>
+    <a href="https://github.com/K-Dense-AI/scientific-agent-skills" target="_blank" class="card-title-link" onclick="event.stopPropagation()">K-Dense-AI/scientific-agent-skills<strong style="font-size:.75rem;color:#64748b;margin-left:6px">scientific-agent-skills</strong></a>
     <button class="expand-btn" id="btn-c0007">▼</button>
   </div>
-  <p class="card-desc-preview">🧬 OpenHuman 开源人类行为建模，构建数字分身与交互</p>
+  <p class="card-desc-preview">⚙️ Agent 框架与工作流编排</p>
   <div class="card-desc-full">
-    <p>🧬 OpenHuman 开源人类行为建模，构建数字分身与交互</p>
-    <span class="tag">Rust</span>
+    <p>⚙️ Agent 框架与工作流编排</p>
+    <span class="tag">Python</span>
     <div class="meta-row">
-      <span class="stars">392 ⭐/周</span>
-      <span class="languages">Rust</span>
+      <span class="stars">400 ⭐/周</span>
+      <span class="languages">Python</span>
     </div>
     <div style="margin-top:6px"><span class="audit-badge" style="background:#f59e0b22;border:1px solid #f59e0b44;color:#f59e0b">⚠️ MEDIUM</span><span class="audit-detail">Active</span></div>
   </div>
 </div><div class="expandable-card" id="card-c0008" onclick="toggleCard('c0008')">
   <div class="card-title-row">
-    <a href="https://github.com/tt-a1i/archify" target="_blank" class="card-title-link" onclick="event.stopPropagation()">tt-a1i/archify<strong style="font-size:.75rem;color:#64748b;margin-left:6px">archify</strong></a>
+    <a href="https://github.com/ConardLi/garden-skills" target="_blank" class="card-title-link" onclick="event.stopPropagation()">ConardLi/garden-skills<strong style="font-size:.75rem;color:#64748b;margin-left:6px">garden-skills</strong></a>
     <button class="expand-btn" id="btn-c0008">▼</button>
   </div>
-  <p class="card-desc-preview">🏗️ Archify 架构设计技能，构建美观可验证的软件架构</p>
+  <p class="card-desc-preview">[JavaScript] 花园式AI技能管理框架</p>
   <div class="card-desc-full">
-    <p>🏗️ Archify 架构设计技能，构建美观可验证的软件架构</p>
+    <p>[JavaScript] 花园式AI技能管理框架</p>
     <span class="tag">JavaScript</span>
     <div class="meta-row">
-      <span class="stars">391 ⭐/周</span>
+      <span class="stars">350 ⭐/周</span>
       <span class="languages">JavaScript</span>
     </div>
     <div style="margin-top:6px"><span class="audit-badge" style="background:#f59e0b22;border:1px solid #f59e0b44;color:#f59e0b">⚠️ MEDIUM</span><span class="audit-detail">Active</span></div>
   </div>
 </div><div class="expandable-card" id="card-c0009" onclick="toggleCard('c0009')">
   <div class="card-title-row">
-    <a href="https://github.com/THU-MAIC/OpenMAIC" target="_blank" class="card-title-link" onclick="event.stopPropagation()">THU-MAIC/OpenMAIC<strong style="font-size:.75rem;color:#64748b;margin-left:6px">OpenMAIC</strong></a>
+    <a href="https://github.com/cursor/plugins" target="_blank" class="card-title-link" onclick="event.stopPropagation()">cursor/plugins<strong style="font-size:.75rem;color:#64748b;margin-left:6px">plugins</strong></a>
     <button class="expand-btn" id="btn-c0009">▼</button>
   </div>
-  <p class="card-desc-preview">⚙️ Agent 框架与工作流编排</p>
+  <p class="card-desc-preview">🛠️ Tool Use / Function Calling 工具调用</p>
   <div class="card-desc-full">
-    <p>⚙️ Agent 框架与工作流编排</p>
+    <p>🛠️ Tool Use / Function Calling 工具调用</p>
     <span class="tag">TypeScript</span>
     <div class="meta-row">
-      <span class="stars">274 ⭐/周</span>
+      <span class="stars">250 ⭐/周</span>
       <span class="languages">TypeScript</span>
     </div>
     <div style="margin-top:6px"><span class="audit-badge" style="background:#f59e0b22;border:1px solid #f59e0b44;color:#f59e0b">⚠️ MEDIUM</span><span class="audit-detail">Active</span></div>
   </div>
-</div><div class="expandable-card" id="card-c0010" onclick="toggleCard('c0010')">
+</div></div>
+</div><div class="section-block">
+  <div class="section-bar">
+    <span class="dot gh"></span>
+    <h2 id="applications">📦 应用百宝箱</h2>
+    <span class="count">5 项 · 2,330 ⭐/周</span>
+  </div>
+  <div class="sub-heading">📦 应用百宝箱 · 5</div>
+  <div class="card-grid"><div class="expandable-card" id="card-c0010" onclick="toggleCard('c0010')">
   <div class="card-title-row">
-    <a href="https://github.com/freestylefly/awesome-gpt-image-2" target="_blank" class="card-title-link" onclick="event.stopPropagation()">freestylefly/awesome-gpt-image-2<strong style="font-size:.75rem;color:#64748b;margin-left:6px">awesome-gpt-image-2</strong></a>
+    <a href="https://github.com/abi/screenshot-to-code" target="_blank" class="card-title-link" onclick="event.stopPropagation()">abi/screenshot-to-code<strong style="font-size:.75rem;color:#64748b;margin-left:6px">screenshot-to-code</strong></a>
     <button class="expand-btn" id="btn-c0010">▼</button>
   </div>
-  <p class="card-desc-preview">🖼️ GPT-Image-2 图片生成教程集，掌握最新图像创作技巧</p>
+  <p class="card-desc-preview">🖼️ 截图转代码，上传设计稿自动生成前端实现</p>
   <div class="card-desc-full">
-    <p>🖼️ GPT-Image-2 图片生成教程集，掌握最新图像创作技巧</p>
+    <p>🖼️ 截图转代码，上传设计稿自动生成前端实现</p>
     <span class="tag">JavaScript</span>
     <div class="meta-row">
-      <span class="stars">264 ⭐/周</span>
+      <span class="stars">800 ⭐/周</span>
       <span class="languages">JavaScript</span>
     </div>
     <div style="margin-top:6px"><span class="audit-badge" style="background:#f59e0b22;border:1px solid #f59e0b44;color:#f59e0b">⚠️ MEDIUM</span><span class="audit-detail">Active</span></div>
   </div>
 </div><div class="expandable-card" id="card-c0011" onclick="toggleCard('c0011')">
   <div class="card-title-row">
-    <a href="https://github.com/anthropics/claude-plugins-community" target="_blank" class="card-title-link" onclick="event.stopPropagation()">anthropics/claude-plugins-community<strong style="font-size:.75rem;color:#64748b;margin-left:6px">claude-plugins-community</strong></a>
+    <a href="https://github.com/MadsLorentzen/ai-job-search" target="_blank" class="card-title-link" onclick="event.stopPropagation()">MadsLorentzen/ai-job-search<strong style="font-size:.75rem;color:#64748b;margin-left:6px">ai-job-search</strong></a>
     <button class="expand-btn" id="btn-c0011">▼</button>
   </div>
-  <p class="card-desc-preview">🤖 Anthropic Claude AI 助手</p>
+  <p class="card-desc-preview">💼 AI求职助手，自动化投递与分析工作机会</p>
   <div class="card-desc-full">
-    <p>🤖 Anthropic Claude AI 助手</p>
+    <p>💼 AI求职助手，自动化投递与分析工作机会</p>
     <span class="tag">Python</span>
     <div class="meta-row">
-      <span class="stars">30 ⭐/周</span>
+      <span class="stars">500 ⭐/周</span>
       <span class="languages">Python</span>
     </div>
     <div style="margin-top:6px"><span class="audit-badge" style="background:#f59e0b22;border:1px solid #f59e0b44;color:#f59e0b">⚠️ MEDIUM</span><span class="audit-detail">Active</span></div>
   </div>
 </div><div class="expandable-card" id="card-c0012" onclick="toggleCard('c0012')">
   <div class="card-title-row">
-    <a href="https://github.com/ConardLi/garden-skills" target="_blank" class="card-title-link" onclick="event.stopPropagation()">ConardLi/garden-skills<strong style="font-size:.75rem;color:#64748b;margin-left:6px">garden-skills</strong></a>
-    <button class="expand-btn" id="btn-c0012">▼</button>
-  </div>
-  <p class="card-desc-preview">🏆 AI Benchmark 评测基准</p>
-  <div class="card-desc-full">
-    <p>🏆 AI Benchmark 评测基准</p>
-    <span class="tag">CSS</span>
-    <div class="meta-row">
-      <span class="stars">0 ⭐/周</span>
-      <span class="languages">CSS</span>
-    </div>
-    <div style="margin-top:6px"><span class="audit-badge" style="background:#f59e0b22;border:1px solid #f59e0b44;color:#f59e0b">⚠️ MEDIUM</span><span class="audit-detail">Active</span></div>
-  </div>
-</div></div>
-</div><div class="section-block">
-  <h2 id="applications">📦 应用百宝箱 · 1个项目 · ⭐516</h2>
-  <div class="subsection-title">📦 应用百宝箱 (1)</div>
-  <div class="card-grid"><div class="expandable-card" id="card-c0013" onclick="toggleCard('c0013')">
-  <div class="card-title-row">
     <a href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" class="card-title-link" onclick="event.stopPropagation()">rohitg00/ai-engineering-from-scratch<strong style="font-size:.75rem;color:#64748b;margin-left:6px">ai-engineering-from-scratch</strong></a>
-    <button class="expand-btn" id="btn-c0013">▼</button>
+    <button class="expand-btn" id="btn-c0012">▼</button>
   </div>
   <p class="card-desc-preview">📚 AI 工程入门教程，从零构建机器学习系统实战指南</p>
   <div class="card-desc-full">
     <p>📚 AI 工程入门教程，从零构建机器学习系统实战指南</p>
     <span class="tag">Python</span>
     <div class="meta-row">
-      <span class="stars">516 ⭐/周</span>
+      <span class="stars">450 ⭐/周</span>
+      <span class="languages">Python</span>
+    </div>
+    <div style="margin-top:6px"><span class="audit-badge" style="background:#f59e0b22;border:1px solid #f59e0b44;color:#f59e0b">⚠️ MEDIUM</span><span class="audit-detail">Active</span></div>
+  </div>
+</div><div class="expandable-card" id="card-c0013" onclick="toggleCard('c0013')">
+  <div class="card-title-row">
+    <a href="https://github.com/tt-a1i/archify" target="_blank" class="card-title-link" onclick="event.stopPropagation()">tt-a1i/archify<strong style="font-size:.75rem;color:#64748b;margin-left:6px">archify</strong></a>
+    <button class="expand-btn" id="btn-c0013">▼</button>
+  </div>
+  <p class="card-desc-preview">🏗️ Archify 架构设计技能，构建美观可验证的软件架构</p>
+  <div class="card-desc-full">
+    <p>🏗️ Archify 架构设计技能，构建美观可验证的软件架构</p>
+    <span class="tag">JavaScript</span>
+    <div class="meta-row">
+      <span class="stars">380 ⭐/周</span>
+      <span class="languages">JavaScript</span>
+    </div>
+    <div style="margin-top:6px"><span class="audit-badge" style="background:#f59e0b22;border:1px solid #f59e0b44;color:#f59e0b">⚠️ MEDIUM</span><span class="audit-detail">Active</span></div>
+  </div>
+</div><div class="expandable-card" id="card-c0014" onclick="toggleCard('c0014')">
+  <div class="card-title-row">
+    <a href="https://github.com/every-app/ai-seo" target="_blank" class="card-title-link" onclick="event.stopPropagation()">every-app/ai-seo<strong style="font-size:.75rem;color:#64748b;margin-left:6px">ai-seo</strong></a>
+    <button class="expand-btn" id="btn-c0014">▼</button>
+  </div>
+  <p class="card-desc-preview">[Python] AI驱动的SEO优化与智能内容生成</p>
+  <div class="card-desc-full">
+    <p>[Python] AI驱动的SEO优化与智能内容生成</p>
+    <span class="tag">Python</span>
+    <div class="meta-row">
+      <span class="stars">200 ⭐/周</span>
       <span class="languages">Python</span>
     </div>
     <div style="margin-top:6px"><span class="audit-badge" style="background:#f59e0b22;border:1px solid #f59e0b44;color:#f59e0b">⚠️ MEDIUM</span><span class="audit-detail">Active</span></div>
   </div>
 </div></div>
 </div><div class="section-block">
-  <h2 id="inspire">💡 灵感仓库 · 1个项目 · ⭐0</h2>
-  <div class="subsection-title">💡 灵感仓库 (1)</div>
-  <div class="card-grid"><div class="expandable-card" id="card-c0014" onclick="toggleCard('c0014')">
-  <div class="card-title-row">
-    <a href="https://github.com/abi/screenshot-to-code" target="_blank" class="card-title-link" onclick="event.stopPropagation()">abi/screenshot-to-code<strong style="font-size:.75rem;color:#64748b;margin-left:6px">screenshot-to-code</strong></a>
-    <button class="expand-btn" id="btn-c0014">▼</button>
+  <div class="section-bar">
+    <span class="dot gh"></span>
+    <h2 id="inspire">💡 灵感仓库</h2>
+    <span class="count">6 项 · 700 ⭐/周</span>
   </div>
-  <p class="card-desc-preview">🖼️ 截图转代码，上传设计稿自动生成前端实现</p>
-  <div class="card-desc-full">
-    <p>🖼️ 截图转代码，上传设计稿自动生成前端实现</p>
-    <span class="tag">Python</span>
-    <div class="meta-row">
-      <span class="stars">0 ⭐/周</span>
-      <span class="languages">Python</span>
-    </div>
-    <div style="margin-top:6px"><span class="audit-badge" style="background:#f59e0b22;border:1px solid #f59e0b44;color:#f59e0b">⚠️ MEDIUM</span><span class="audit-detail">Active</span></div>
-  </div>
-</div></div>
-</div>
-  <div class="section-block">
-  <h2 id="harness">🔌 Harness 插件生态 · 20项</h2>
+  <div class="sub-heading">💡 灵感仓库 · 6</div>
   <div class="card-grid"><div class="expandable-card" id="card-c0015" onclick="toggleCard('c0015')">
   <div class="card-title-row">
-    <a href="https://github.com/openmule/OllamaWebUI" target="_blank" class="card-title-link" onclick="event.stopPropagation()">openmule/OllamaWebUI<strong style="font-size:.75rem;color:#64748b;margin-left:6px">OllamaWebUI</strong></a>
+    <a href="https://github.com/p-e-w/ai-heretic" target="_blank" class="card-title-link" onclick="event.stopPropagation()">p-e-w/ai-heretic<strong style="font-size:.75rem;color:#64748b;margin-left:6px">ai-heretic</strong></a>
     <button class="expand-btn" id="btn-c0015">▼</button>
   </div>
-  <p class="card-desc-preview">🌐 OllamaWebUI 本地大模型Web管理界面</p>
+  <p class="card-desc-preview">[Python] AI自适应代码审查与智能质量评估</p>
   <div class="card-desc-full">
-    <p>🌐 OllamaWebUI 本地大模型Web管理界面</p>
-    <span class="tag">Ollama</span><span class="tag">Local</span>
+    <p>[Python] AI自适应代码审查与智能质量评估</p>
+    <span class="tag">Python</span>
     <div class="meta-row">
-      <span class="stars">60,000 ⭐/周</span>
-      <span class="languages">TypeScript</span>
+      <span class="stars">180 ⭐/周</span>
+      <span class="languages">Python</span>
     </div>
     <div style="margin-top:6px"><span class="audit-badge" style="background:#f59e0b22;border:1px solid #f59e0b44;color:#f59e0b">⚠️ MEDIUM</span><span class="audit-detail">Active</span></div>
   </div>
 </div><div class="expandable-card" id="card-c0016" onclick="toggleCard('c0016')">
   <div class="card-title-row">
-    <a href="https://github.com/openmule/OllamaWebUI" target="_blank" class="card-title-link" onclick="event.stopPropagation()">openmule/OllamaWebUI<strong style="font-size:.75rem;color:#64748b;margin-left:6px">OllamaWebUI</strong></a>
+    <a href="https://github.com/AprilNEA/AILogic" target="_blank" class="card-title-link" onclick="event.stopPropagation()">AprilNEA/AILogic<strong style="font-size:.75rem;color:#64748b;margin-left:6px">AILogic</strong></a>
     <button class="expand-btn" id="btn-c0016">▼</button>
   </div>
-  <p class="card-desc-preview">🌐 OllamaWebUI本地大模型Web管理界面，支持多种模型切换</p>
+  <p class="card-desc-preview">[Python] AI智能日志分析与异常检测平台</p>
   <div class="card-desc-full">
-    <p>🌐 OllamaWebUI本地大模型Web管理界面，支持多种模型切换</p>
-    <span class="tag">Ollama</span><span class="tag">Local</span>
+    <p>[Python] AI智能日志分析与异常检测平台</p>
+    <span class="tag">Python</span>
     <div class="meta-row">
-      <span class="stars">60,000 ⭐/周</span>
-      <span class="languages">TypeScript</span>
+      <span class="stars">150 ⭐/周</span>
+      <span class="languages">Python</span>
     </div>
     <div style="margin-top:6px"><span class="audit-badge" style="background:#f59e0b22;border:1px solid #f59e0b44;color:#f59e0b">⚠️ MEDIUM</span><span class="audit-detail">Active</span></div>
   </div>
 </div><div class="expandable-card" id="card-c0017" onclick="toggleCard('c0017')">
   <div class="card-title-row">
-    <a href="https://github.com/BuilderIO/open-devin" target="_blank" class="card-title-link" onclick="event.stopPropagation()">builder-io/open-devin<strong style="font-size:.75rem;color:#64748b;margin-left:6px">open-devin</strong></a>
+    <a href="https://github.com/apache/makait" target="_blank" class="card-title-link" onclick="event.stopPropagation()">apache/makait<strong style="font-size:.75rem;color:#64748b;margin-left:6px">makait</strong></a>
     <button class="expand-btn" id="btn-c0017">▼</button>
   </div>
-  <p class="card-desc-preview">🚀 Open Devin 开源自主开发者智能体，代码生成与项目管理</p>
+  <p class="card-desc-preview">[JavaScript] Apache 可视化AI应用构建平台</p>
   <div class="card-desc-full">
-    <p>🚀 Open Devin 开源自主开发者智能体，代码生成与项目管理</p>
-    <span class="tag">OpenDevin</span><span class="tag">Developer</span>
+    <p>[JavaScript] Apache 可视化AI应用构建平台</p>
+    <span class="tag">JavaScript</span>
     <div class="meta-row">
-      <span class="stars">50,000 ⭐/周</span>
-      <span class="languages">Python</span>
+      <span class="stars">120 ⭐/周</span>
+      <span class="languages">JavaScript</span>
     </div>
     <div style="margin-top:6px"><span class="audit-badge" style="background:#f59e0b22;border:1px solid #f59e0b44;color:#f59e0b">⚠️ MEDIUM</span><span class="audit-detail">Active</span></div>
   </div>
 </div><div class="expandable-card" id="card-c0018" onclick="toggleCard('c0018')">
   <div class="card-title-row">
-    <a href="https://github.com/comfyanonymous/ComfyUI" target="_blank" class="card-title-link" onclick="event.stopPropagation()">comfyanonymous/ComfyUI<strong style="font-size:.75rem;color:#64748b;margin-left:6px">ComfyUI</strong></a>
+    <a href="https://github.com/omacom/ai-orchard" target="_blank" class="card-title-link" onclick="event.stopPropagation()">omacom/ai-orchard<strong style="font-size:.75rem;color:#64748b;margin-left:6px">ai-orchard</strong></a>
     <button class="expand-btn" id="btn-c0018">▼</button>
   </div>
-  <p class="card-desc-preview">🎨 ComfyUI 节点式工作流图像生成工具</p>
+  <p class="card-desc-preview">[Python] AI驱动的OS定制与智能运维管理工具</p>
   <div class="card-desc-full">
-    <p>🎨 ComfyUI 节点式工作流图像生成工具</p>
-    <span class="tag">Image Gen</span><span class="tag">Workflow</span>
+    <p>[Python] AI驱动的OS定制与智能运维管理工具</p>
+    <span class="tag">Python</span>
     <div class="meta-row">
-      <span class="stars">48,000 ⭐/周</span>
+      <span class="stars">100 ⭐/周</span>
       <span class="languages">Python</span>
     </div>
     <div style="margin-top:6px"><span class="audit-badge" style="background:#f59e0b22;border:1px solid #f59e0b44;color:#f59e0b">⚠️ MEDIUM</span><span class="audit-detail">Active</span></div>
   </div>
 </div><div class="expandable-card" id="card-c0019" onclick="toggleCard('c0019')">
   <div class="card-title-row">
-    <a href="https://github.com/comfyanonymous/ComfyUI" target="_blank" class="card-title-link" onclick="event.stopPropagation()">comfyanonymous/ComfyUI<strong style="font-size:.75rem;color:#64748b;margin-left:6px">ComfyUI</strong></a>
+    <a href="https://github.com/asciimoo/ai-hist" target="_blank" class="card-title-link" onclick="event.stopPropagation()">asciimoo/ai-hist<strong style="font-size:.75rem;color:#64748b;margin-left:6px">ai-hist</strong></a>
     <button class="expand-btn" id="btn-c0019">▼</button>
   </div>
-  <p class="card-desc-preview">🎨 ComfyUI节点式工作流图像生成工具，支持SD等模型</p>
+  <p class="card-desc-preview">[Rust] AI增强的命令行历史记录与智能检索</p>
   <div class="card-desc-full">
-    <p>🎨 ComfyUI节点式工作流图像生成工具，支持SD等模型</p>
-    <span class="tag">Image Gen</span><span class="tag">Workflow</span>
+    <p>[Rust] AI增强的命令行历史记录与智能检索</p>
+    <span class="tag">Rust</span>
+    <div class="meta-row">
+      <span class="stars">80 ⭐/周</span>
+      <span class="languages">Rust</span>
+    </div>
+    <div style="margin-top:6px"><span class="audit-badge" style="background:#f59e0b22;border:1px solid #f59e0b44;color:#f59e0b">⚠️ MEDIUM</span><span class="audit-detail">Active</span></div>
+  </div>
+</div><div class="expandable-card" id="card-c0020" onclick="toggleCard('c0020')">
+  <div class="card-title-row">
+    <a href="https://github.com/freestylefly/awesome-gpt-image-2" target="_blank" class="card-title-link" onclick="event.stopPropagation()">freestylefly/awesome-gpt-image-2<strong style="font-size:.75rem;color:#64748b;margin-left:6px">awesome-gpt-image-2</strong></a>
+    <button class="expand-btn" id="btn-c0020">▼</button>
+  </div>
+  <p class="card-desc-preview">🖼️ GPT-Image-2 图片生成教程集，掌握最新图像创作技巧</p>
+  <div class="card-desc-full">
+    <p>🖼️ GPT-Image-2 图片生成教程集，掌握最新图像创作技巧</p>
+    <span class="tag">JavaScript</span>
+    <div class="meta-row">
+      <span class="stars">70 ⭐/周</span>
+      <span class="languages">JavaScript</span>
+    </div>
+    <div style="margin-top:6px"><span class="audit-badge" style="background:#f59e0b22;border:1px solid #f59e0b44;color:#f59e0b">⚠️ MEDIUM</span><span class="audit-detail">Active</span></div>
+  </div>
+</div></div>
+</div>
+  <div class="section-block">
+  <div class="section-bar">
+    <span class="dot hx"></span>
+    <h2 id="harness">Harness 插件生态</h2>
+    <span class="count">20 项</span>
+  </div>
+  <div class="card-grid"><div class="expandable-card" id="card-c0021" onclick="toggleCard('c0021')">
+  <div class="card-title-row">
+    <a href="https://github.com/openmule/OllamaWebUI" target="_blank" class="card-title-link" onclick="event.stopPropagation()">openmule/OllamaWebUI<strong style="font-size:.75rem;color:#64748b;margin-left:6px">OllamaWebUI</strong></a>
+    <button class="expand-btn" id="btn-c0021">▼</button>
+  </div>
+  <p class="card-desc-preview">🌐 OllamaWebUI 本地大模型Web管理界面</p>
+  <div class="card-desc-full">
+    <p>🌐 OllamaWebUI 本地大模型Web管理界面</p>
+    <span class="tag tag-purple">Ollama</span><span class="tag tag-purple">Local</span>
+    <div class="meta-row">
+      <span class="stars">60,000 ⭐/周</span>
+      <span class="languages">TypeScript</span>
+    </div>
+    <div style="margin-top:6px"><span class="audit-badge" style="background:#f59e0b22;border:1px solid #f59e0b44;color:#f59e0b">⚠️ MEDIUM</span><span class="audit-detail">Active</span></div>
+  </div>
+</div><div class="expandable-card" id="card-c0022" onclick="toggleCard('c0022')">
+  <div class="card-title-row">
+    <a href="https://github.com/openmule/OllamaWebUI" target="_blank" class="card-title-link" onclick="event.stopPropagation()">openmule/OllamaWebUI<strong style="font-size:.75rem;color:#64748b;margin-left:6px">OllamaWebUI</strong></a>
+    <button class="expand-btn" id="btn-c0022">▼</button>
+  </div>
+  <p class="card-desc-preview">🌐 OllamaWebUI本地大模型Web管理界面，支持多种模型切换</p>
+  <div class="card-desc-full">
+    <p>🌐 OllamaWebUI本地大模型Web管理界面，支持多种模型切换</p>
+    <span class="tag tag-purple">Ollama</span><span class="tag tag-purple">Local</span>
+    <div class="meta-row">
+      <span class="stars">60,000 ⭐/周</span>
+      <span class="languages">TypeScript</span>
+    </div>
+    <div style="margin-top:6px"><span class="audit-badge" style="background:#f59e0b22;border:1px solid #f59e0b44;color:#f59e0b">⚠️ MEDIUM</span><span class="audit-detail">Active</span></div>
+  </div>
+</div><div class="expandable-card" id="card-c0023" onclick="toggleCard('c0023')">
+  <div class="card-title-row">
+    <a href="https://github.com/BuilderIO/open-devin" target="_blank" class="card-title-link" onclick="event.stopPropagation()">builder-io/open-devin<strong style="font-size:.75rem;color:#64748b;margin-left:6px">open-devin</strong></a>
+    <button class="expand-btn" id="btn-c0023">▼</button>
+  </div>
+  <p class="card-desc-preview">🚀 Open Devin 开源自主开发者智能体，代码生成与项目管理</p>
+  <div class="card-desc-full">
+    <p>🚀 Open Devin 开源自主开发者智能体，代码生成与项目管理</p>
+    <span class="tag tag-purple">OpenDevin</span><span class="tag tag-purple">Developer</span>
+    <div class="meta-row">
+      <span class="stars">50,000 ⭐/周</span>
+      <span class="languages">Python</span>
+    </div>
+    <div style="margin-top:6px"><span class="audit-badge" style="background:#f59e0b22;border:1px solid #f59e0b44;color:#f59e0b">⚠️ MEDIUM</span><span class="audit-detail">Active</span></div>
+  </div>
+</div><div class="expandable-card" id="card-c0024" onclick="toggleCard('c0024')">
+  <div class="card-title-row">
+    <a href="https://github.com/comfyanonymous/ComfyUI" target="_blank" class="card-title-link" onclick="event.stopPropagation()">comfyanonymous/ComfyUI<strong style="font-size:.75rem;color:#64748b;margin-left:6px">ComfyUI</strong></a>
+    <button class="expand-btn" id="btn-c0024">▼</button>
+  </div>
+  <p class="card-desc-preview">🎨 ComfyUI 节点式工作流图像生成工具</p>
+  <div class="card-desc-full">
+    <p>🎨 ComfyUI 节点式工作流图像生成工具</p>
+    <span class="tag tag-purple">Image Gen</span><span class="tag tag-purple">Workflow</span>
     <div class="meta-row">
       <span class="stars">48,000 ⭐/周</span>
       <span class="languages">Python</span>
     </div>
     <div style="margin-top:6px"><span class="audit-badge" style="background:#f59e0b22;border:1px solid #f59e0b44;color:#f59e0b">⚠️ MEDIUM</span><span class="audit-detail">Active</span></div>
   </div>
-</div><div class="expandable-card" id="card-c0020" onclick="toggleCard('c0020')">
-  <div class="card-title-row">
-    <a href="https://github.com/anthropics/claude-code" target="_blank" class="card-title-link" onclick="event.stopPropagation()">anthropics/claude-code<strong style="font-size:.75rem;color:#64748b;margin-left:6px">claude-code</strong></a>
-    <button class="expand-btn" id="btn-c0020">▼</button>
-  </div>
-  <p class="card-desc-preview">💻 Anthropic 官方终端 AI 编程代理，交互式开发助手</p>
-  <div class="card-desc-full">
-    <p>💻 Anthropic 官方终端 AI 编程代理，交互式开发助手</p>
-    <span class="tag">Anthropic</span><span class="tag">Terminal</span>
-    <div class="meta-row">
-      <span class="stars">45,000 ⭐/周</span>
-      <span class="languages">TypeScript</span>
-    </div>
-    <div style="margin-top:6px"><span class="audit-badge" style="background:#ef444422;border:1px solid #ef444444;color:#ef4444">🔴 HIGH</span><span class="audit-detail">Active</span></div>
-  </div>
-</div><div class="expandable-card" id="card-c0021" onclick="toggleCard('c0021')">
-  <div class="card-title-row">
-    <a href="https://github.com/go-skynet/AnythingLLM" target="_blank" class="card-title-link" onclick="event.stopPropagation()">go-skynet/AnythingLLM<strong style="font-size:.75rem;color:#64748b;margin-left:6px">AnythingLLM</strong></a>
-    <button class="expand-btn" id="btn-c0021">▼</button>
-  </div>
-  <p class="card-desc-preview">🗂️ AnythingLLM 全栈 RAG 应用框架，知识库对话</p>
-  <div class="card-desc-full">
-    <p>🗂️ AnythingLLM 全栈 RAG 应用框架，知识库对话</p>
-    <span class="tag">LLM</span><span class="tag">RAG</span>
-    <div class="meta-row">
-      <span class="stars">45,000 ⭐/周</span>
-      <span class="languages">JavaScript</span>
-    </div>
-    <div style="margin-top:6px"><span class="audit-badge" style="background:#f59e0b22;border:1px solid #f59e0b44;color:#f59e0b">⚠️ MEDIUM</span><span class="audit-detail">Active</span></div>
-  </div>
-</div><div class="expandable-card" id="card-c0022" onclick="toggleCard('c0022')">
-  <div class="card-title-row">
-    <a href="https://github.com/go-skynet/AnythingLLM" target="_blank" class="card-title-link" onclick="event.stopPropagation()">go-skynet/AnythingLLM<strong style="font-size:.75rem;color:#64748b;margin-left:6px">AnythingLLM</strong></a>
-    <button class="expand-btn" id="btn-c0022">▼</button>
-  </div>
-  <p class="card-desc-preview">🗂️ AnythingLLM全栈RAG应用框架，知识库对话与检索增强</p>
-  <div class="card-desc-full">
-    <p>🗂️ AnythingLLM全栈RAG应用框架，知识库对话与检索增强</p>
-    <span class="tag">LLM</span><span class="tag">RAG</span>
-    <div class="meta-row">
-      <span class="stars">45,000 ⭐/周</span>
-      <span class="languages">JavaScript</span>
-    </div>
-    <div style="margin-top:6px"><span class="audit-badge" style="background:#f59e0b22;border:1px solid #f59e0b44;color:#f59e0b">⚠️ MEDIUM</span><span class="audit-detail">Active</span></div>
-  </div>
-</div><div class="expandable-card" id="card-c0023" onclick="toggleCard('c0023')">
-  <div class="card-title-row">
-    <a href="https://github.com/flowise-ai/FlowiseAI" target="_blank" class="card-title-link" onclick="event.stopPropagation()">flowise-ai/FlowiseAI<strong style="font-size:.75rem;color:#64748b;margin-left:6px">FlowiseAI</strong></a>
-    <button class="expand-btn" id="btn-c0023">▼</button>
-  </div>
-  <p class="card-desc-preview">🔗 FlowiseAI 拖拽式 LLM 应用构建平台</p>
-  <div class="card-desc-full">
-    <p>🔗 FlowiseAI 拖拽式 LLM 应用构建平台</p>
-    <span class="tag">LLM</span><span class="tag">No-Code</span>
-    <div class="meta-row">
-      <span class="stars">38,000 ⭐/周</span>
-      <span class="languages">TypeScript</span>
-    </div>
-    <div style="margin-top:6px"><span class="audit-badge" style="background:#f59e0b22;border:1px solid #f59e0b44;color:#f59e0b">⚠️ MEDIUM</span><span class="audit-detail">Active</span></div>
-  </div>
-</div><div class="expandable-card" id="card-c0024" onclick="toggleCard('c0024')">
-  <div class="card-title-row">
-    <a href="https://github.com/danny-avila/LibreChat" target="_blank" class="card-title-link" onclick="event.stopPropagation()">danny-avila/LibreChat<strong style="font-size:.75rem;color:#64748b;margin-left:6px">LibreChat</strong></a>
-    <button class="expand-btn" id="btn-c0024">▼</button>
-  </div>
-  <p class="card-desc-preview">💬 LibreChat 开源聊天聚合平台，多模型统一接入</p>
-  <div class="card-desc-full">
-    <p>💬 LibreChat 开源聊天聚合平台，多模型统一接入</p>
-    <span class="tag">Chat</span><span class="tag">Open Source</span>
-    <div class="meta-row">
-      <span class="stars">38,000 ⭐/周</span>
-      <span class="languages">JavaScript</span>
-    </div>
-    <div style="margin-top:6px"><span class="audit-badge" style="background:#f59e0b22;border:1px solid #f59e0b44;color:#f59e0b">⚠️ MEDIUM</span><span class="audit-detail">Active</span></div>
-  </div>
 </div><div class="expandable-card" id="card-c0025" onclick="toggleCard('c0025')">
   <div class="card-title-row">
-    <a href="https://github.com/flowise-ai/FlowiseAI" target="_blank" class="card-title-link" onclick="event.stopPropagation()">flowise-ai/FlowiseAI<strong style="font-size:.75rem;color:#64748b;margin-left:6px">FlowiseAI</strong></a>
+    <a href="https://github.com/comfyanonymous/ComfyUI" target="_blank" class="card-title-link" onclick="event.stopPropagation()">comfyanonymous/ComfyUI<strong style="font-size:.75rem;color:#64748b;margin-left:6px">ComfyUI</strong></a>
     <button class="expand-btn" id="btn-c0025">▼</button>
   </div>
-  <p class="card-desc-preview">🔗 FlowiseAI 拖拽式LLM应用构建平台，零代码搭建AI应用</p>
+  <p class="card-desc-preview">🎨 ComfyUI节点式工作流图像生成工具，支持SD等模型</p>
   <div class="card-desc-full">
-    <p>🔗 FlowiseAI 拖拽式LLM应用构建平台，零代码搭建AI应用</p>
-    <span class="tag">LLM</span><span class="tag">No-Code</span>
+    <p>🎨 ComfyUI节点式工作流图像生成工具，支持SD等模型</p>
+    <span class="tag tag-purple">Image Gen</span><span class="tag tag-purple">Workflow</span>
     <div class="meta-row">
-      <span class="stars">38,000 ⭐/周</span>
-      <span class="languages">TypeScript</span>
+      <span class="stars">48,000 ⭐/周</span>
+      <span class="languages">Python</span>
     </div>
     <div style="margin-top:6px"><span class="audit-badge" style="background:#f59e0b22;border:1px solid #f59e0b44;color:#f59e0b">⚠️ MEDIUM</span><span class="audit-detail">Active</span></div>
   </div>
 </div><div class="expandable-card" id="card-c0026" onclick="toggleCard('c0026')">
   <div class="card-title-row">
-    <a href="https://github.com/danny-avila/LibreChat" target="_blank" class="card-title-link" onclick="event.stopPropagation()">danny-avila/LibreChat<strong style="font-size:.75rem;color:#64748b;margin-left:6px">LibreChat</strong></a>
+    <a href="https://github.com/anthropics/claude-code" target="_blank" class="card-title-link" onclick="event.stopPropagation()">anthropics/claude-code<strong style="font-size:.75rem;color:#64748b;margin-left:6px">claude-code</strong></a>
     <button class="expand-btn" id="btn-c0026">▼</button>
+  </div>
+  <p class="card-desc-preview">💻 Anthropic 官方终端 AI 编程代理，交互式开发助手</p>
+  <div class="card-desc-full">
+    <p>💻 Anthropic 官方终端 AI 编程代理，交互式开发助手</p>
+    <span class="tag tag-purple">Anthropic</span><span class="tag tag-purple">Terminal</span>
+    <div class="meta-row">
+      <span class="stars">45,000 ⭐/周</span>
+      <span class="languages">TypeScript</span>
+    </div>
+    <div style="margin-top:6px"><span class="audit-badge" style="background:#f59e0b22;border:1px solid #f59e0b44;color:#f59e0b">⚠️ MEDIUM</span><span class="audit-detail">Active</span></div>
+  </div>
+</div><div class="expandable-card" id="card-c0027" onclick="toggleCard('c0027')">
+  <div class="card-title-row">
+    <a href="https://github.com/go-skynet/AnythingLLM" target="_blank" class="card-title-link" onclick="event.stopPropagation()">go-skynet/AnythingLLM<strong style="font-size:.75rem;color:#64748b;margin-left:6px">AnythingLLM</strong></a>
+    <button class="expand-btn" id="btn-c0027">▼</button>
+  </div>
+  <p class="card-desc-preview">🗂️ AnythingLLM 全栈 RAG 应用框架，知识库对话</p>
+  <div class="card-desc-full">
+    <p>🗂️ AnythingLLM 全栈 RAG 应用框架，知识库对话</p>
+    <span class="tag tag-purple">LLM</span><span class="tag tag-purple">RAG</span>
+    <div class="meta-row">
+      <span class="stars">45,000 ⭐/周</span>
+      <span class="languages">JavaScript</span>
+    </div>
+    <div style="margin-top:6px"><span class="audit-badge" style="background:#f59e0b22;border:1px solid #f59e0b44;color:#f59e0b">⚠️ MEDIUM</span><span class="audit-detail">Active</span></div>
+  </div>
+</div><div class="expandable-card" id="card-c0028" onclick="toggleCard('c0028')">
+  <div class="card-title-row">
+    <a href="https://github.com/go-skynet/AnythingLLM" target="_blank" class="card-title-link" onclick="event.stopPropagation()">go-skynet/AnythingLLM<strong style="font-size:.75rem;color:#64748b;margin-left:6px">AnythingLLM</strong></a>
+    <button class="expand-btn" id="btn-c0028">▼</button>
+  </div>
+  <p class="card-desc-preview">🗂️ AnythingLLM全栈RAG应用框架，知识库对话与检索增强</p>
+  <div class="card-desc-full">
+    <p>🗂️ AnythingLLM全栈RAG应用框架，知识库对话与检索增强</p>
+    <span class="tag tag-purple">LLM</span><span class="tag tag-purple">RAG</span>
+    <div class="meta-row">
+      <span class="stars">45,000 ⭐/周</span>
+      <span class="languages">JavaScript</span>
+    </div>
+    <div style="margin-top:6px"><span class="audit-badge" style="background:#f59e0b22;border:1px solid #f59e0b44;color:#f59e0b">⚠️ MEDIUM</span><span class="audit-detail">Active</span></div>
+  </div>
+</div><div class="expandable-card" id="card-c0029" onclick="toggleCard('c0029')">
+  <div class="card-title-row">
+    <a href="https://github.com/flowise-ai/FlowiseAI" target="_blank" class="card-title-link" onclick="event.stopPropagation()">flowise-ai/FlowiseAI<strong style="font-size:.75rem;color:#64748b;margin-left:6px">FlowiseAI</strong></a>
+    <button class="expand-btn" id="btn-c0029">▼</button>
+  </div>
+  <p class="card-desc-preview">🔗 FlowiseAI 拖拽式 LLM 应用构建平台</p>
+  <div class="card-desc-full">
+    <p>🔗 FlowiseAI 拖拽式 LLM 应用构建平台</p>
+    <span class="tag tag-purple">LLM</span><span class="tag tag-purple">No-Code</span>
+    <div class="meta-row">
+      <span class="stars">38,000 ⭐/周</span>
+      <span class="languages">TypeScript</span>
+    </div>
+    <div style="margin-top:6px"><span class="audit-badge" style="background:#f59e0b22;border:1px solid #f59e0b44;color:#f59e0b">⚠️ MEDIUM</span><span class="audit-detail">Active</span></div>
+  </div>
+</div><div class="expandable-card" id="card-c0030" onclick="toggleCard('c0030')">
+  <div class="card-title-row">
+    <a href="https://github.com/danny-avila/LibreChat" target="_blank" class="card-title-link" onclick="event.stopPropagation()">danny-avila/LibreChat<strong style="font-size:.75rem;color:#64748b;margin-left:6px">LibreChat</strong></a>
+    <button class="expand-btn" id="btn-c0030">▼</button>
   </div>
   <p class="card-desc-preview">💬 LibreChat 开源聊天聚合平台，多模型统一接入</p>
   <div class="card-desc-full">
     <p>💬 LibreChat 开源聊天聚合平台，多模型统一接入</p>
-    <span class="tag">Chat</span><span class="tag">Open Source</span>
+    <span class="tag tag-purple">Chat</span><span class="tag tag-purple">Open Source</span>
     <div class="meta-row">
       <span class="stars">38,000 ⭐/周</span>
       <span class="languages">JavaScript</span>
     </div>
     <div style="margin-top:6px"><span class="audit-badge" style="background:#f59e0b22;border:1px solid #f59e0b44;color:#f59e0b">⚠️ MEDIUM</span><span class="audit-detail">Active</span></div>
   </div>
-</div><div class="expandable-card" id="card-c0027" onclick="toggleCard('c0027')">
+</div><div class="expandable-card" id="card-c0031" onclick="toggleCard('c0031')">
+  <div class="card-title-row">
+    <a href="https://github.com/flowise-ai/FlowiseAI" target="_blank" class="card-title-link" onclick="event.stopPropagation()">flowise-ai/FlowiseAI<strong style="font-size:.75rem;color:#64748b;margin-left:6px">FlowiseAI</strong></a>
+    <button class="expand-btn" id="btn-c0031">▼</button>
+  </div>
+  <p class="card-desc-preview">🔗 FlowiseAI 拖拽式LLM应用构建平台，零代码搭建AI应用</p>
+  <div class="card-desc-full">
+    <p>🔗 FlowiseAI 拖拽式LLM应用构建平台，零代码搭建AI应用</p>
+    <span class="tag tag-purple">LLM</span><span class="tag tag-purple">No-Code</span>
+    <div class="meta-row">
+      <span class="stars">38,000 ⭐/周</span>
+      <span class="languages">TypeScript</span>
+    </div>
+    <div style="margin-top:6px"><span class="audit-badge" style="background:#f59e0b22;border:1px solid #f59e0b44;color:#f59e0b">⚠️ MEDIUM</span><span class="audit-detail">Active</span></div>
+  </div>
+</div><div class="expandable-card" id="card-c0032" onclick="toggleCard('c0032')">
+  <div class="card-title-row">
+    <a href="https://github.com/danny-avila/LibreChat" target="_blank" class="card-title-link" onclick="event.stopPropagation()">danny-avila/LibreChat<strong style="font-size:.75rem;color:#64748b;margin-left:6px">LibreChat</strong></a>
+    <button class="expand-btn" id="btn-c0032">▼</button>
+  </div>
+  <p class="card-desc-preview">💬 LibreChat 开源聊天聚合平台，多模型统一接入</p>
+  <div class="card-desc-full">
+    <p>💬 LibreChat 开源聊天聚合平台，多模型统一接入</p>
+    <span class="tag tag-purple">Chat</span><span class="tag tag-purple">Open Source</span>
+    <div class="meta-row">
+      <span class="stars">38,000 ⭐/周</span>
+      <span class="languages">JavaScript</span>
+    </div>
+    <div style="margin-top:6px"><span class="audit-badge" style="background:#f59e0b22;border:1px solid #f59e0b44;color:#f59e0b">⚠️ MEDIUM</span><span class="audit-detail">Active</span></div>
+  </div>
+</div><div class="expandable-card" id="card-c0033" onclick="toggleCard('c0033')">
   <div class="card-title-row">
     <a href="https://github.com/vercel/ai" target="_blank" class="card-title-link" onclick="event.stopPropagation()">vercel/ai<strong style="font-size:.75rem;color:#64748b;margin-left:6px">ai</strong></a>
-    <button class="expand-btn" id="btn-c0027">▼</button>
+    <button class="expand-btn" id="btn-c0033">▼</button>
   </div>
   <p class="card-desc-preview">⚡ Vercel AI SDK，构建流式AI驱动界面</p>
   <div class="card-desc-full">
     <p>⚡ Vercel AI SDK，构建流式AI驱动界面</p>
-    <span class="tag">Vercel</span><span class="tag">SDK</span>
+    <span class="tag tag-purple">Vercel</span><span class="tag tag-purple">SDK</span>
     <div class="meta-row">
       <span class="stars">32,000 ⭐/周</span>
       <span class="languages">TypeScript</span>
     </div>
     <div style="margin-top:6px"><span class="audit-badge" style="background:#f59e0b22;border:1px solid #f59e0b44;color:#f59e0b">⚠️ MEDIUM</span><span class="audit-detail">Active</span></div>
   </div>
-</div><div class="expandable-card" id="card-c0028" onclick="toggleCard('c0028')">
+</div><div class="expandable-card" id="card-c0034" onclick="toggleCard('c0034')">
   <div class="card-title-row">
     <a href="https://github.com/langchain-ai/langgraph" target="_blank" class="card-title-link" onclick="event.stopPropagation()">langchain-ai/langgraph<strong style="font-size:.75rem;color:#64748b;margin-left:6px">langgraph</strong></a>
-    <button class="expand-btn" id="btn-c0028">▼</button>
+    <button class="expand-btn" id="btn-c0034">▼</button>
   </div>
   <p class="card-desc-preview">⚙️ LangGraph 有状态Agent工作流编排框架</p>
   <div class="card-desc-full">
     <p>⚙️ LangGraph 有状态Agent工作流编排框架</p>
-    <span class="tag">LangChain</span><span class="tag">Workflow</span>
+    <span class="tag tag-purple">LangChain</span><span class="tag tag-purple">Workflow</span>
     <div class="meta-row">
       <span class="stars">22,000 ⭐/周</span>
       <span class="languages">Python</span>
     </div>
     <div style="margin-top:6px"><span class="audit-badge" style="background:#f59e0b22;border:1px solid #f59e0b44;color:#f59e0b">⚠️ MEDIUM</span><span class="audit-detail">Active</span></div>
   </div>
-</div><div class="expandable-card" id="card-c0029" onclick="toggleCard('c0029')">
+</div><div class="expandable-card" id="card-c0035" onclick="toggleCard('c0035')">
   <div class="card-title-row">
     <a href="https://github.com/langchain-ai/langgraph" target="_blank" class="card-title-link" onclick="event.stopPropagation()">langchain-ai/langgraph<strong style="font-size:.75rem;color:#64748b;margin-left:6px">langgraph</strong></a>
-    <button class="expand-btn" id="btn-c0029">▼</button>
+    <button class="expand-btn" id="btn-c0035">▼</button>
   </div>
   <p class="card-desc-preview">⚙️ LangGraph 有状态Agent工作流编排框架</p>
   <div class="card-desc-full">
     <p>⚙️ LangGraph 有状态Agent工作流编排框架</p>
-    <span class="tag">LangChain</span><span class="tag">Workflow</span>
+    <span class="tag tag-purple">LangChain</span><span class="tag tag-purple">Workflow</span>
     <div class="meta-row">
       <span class="stars">22,000 ⭐/周</span>
       <span class="languages">Python</span>
     </div>
     <div style="margin-top:6px"><span class="audit-badge" style="background:#f59e0b22;border:1px solid #f59e0b44;color:#f59e0b">⚠️ MEDIUM</span><span class="audit-detail">Active</span></div>
   </div>
-</div><div class="expandable-card" id="card-c0030" onclick="toggleCard('c0030')">
+</div><div class="expandable-card" id="card-c0036" onclick="toggleCard('c0036')">
   <div class="card-title-row">
     <a href="https://github.com/run-llama/lagent" target="_blank" class="card-title-link" onclick="event.stopPropagation()">run-llama/lagent<strong style="font-size:.75rem;color:#64748b;margin-left:6px">lagent</strong></a>
-    <button class="expand-btn" id="btn-c0030">▼</button>
+    <button class="expand-btn" id="btn-c0036">▼</button>
   </div>
   <p class="card-desc-preview">🔄 LlamaIndex Agent 框架，构建可扩展的AI应用</p>
   <div class="card-desc-full">
     <p>🔄 LlamaIndex Agent 框架，构建可扩展的AI应用</p>
-    <span class="tag">LLM</span><span class="tag">Agent</span>
+    <span class="tag tag-purple">LLM</span><span class="tag tag-purple">Agent</span>
     <div class="meta-row">
       <span class="stars">15,000 ⭐/周</span>
       <span class="languages">Python</span>
     </div>
     <div style="margin-top:6px"><span class="audit-badge" style="background:#f59e0b22;border:1px solid #f59e0b44;color:#f59e0b">⚠️ MEDIUM</span><span class="audit-detail">Active</span></div>
   </div>
-</div><div class="expandable-card" id="card-c0031" onclick="toggleCard('c0031')">
+</div><div class="expandable-card" id="card-c0037" onclick="toggleCard('c0037')">
   <div class="card-title-row">
     <a href="https://github.com/run-llama/lagent" target="_blank" class="card-title-link" onclick="event.stopPropagation()">run-llama/lagent<strong style="font-size:.75rem;color:#64748b;margin-left:6px">lagent</strong></a>
-    <button class="expand-btn" id="btn-c0031">▼</button>
+    <button class="expand-btn" id="btn-c0037">▼</button>
   </div>
   <p class="card-desc-preview">🔄 LlamaIndex Agent 框架，构建可扩展的AI应用</p>
   <div class="card-desc-full">
     <p>🔄 LlamaIndex Agent 框架，构建可扩展的AI应用</p>
-    <span class="tag">LLM</span><span class="tag">Agent</span>
+    <span class="tag tag-purple">LLM</span><span class="tag tag-purple">Agent</span>
     <div class="meta-row">
       <span class="stars">15,000 ⭐/周</span>
       <span class="languages">Python</span>
     </div>
     <div style="margin-top:6px"><span class="audit-badge" style="background:#f59e0b22;border:1px solid #f59e0b44;color:#f59e0b">⚠️ MEDIUM</span><span class="audit-detail">Active</span></div>
   </div>
-</div><div class="expandable-card" id="card-c0032" onclick="toggleCard('c0032')">
+</div><div class="expandable-card" id="card-c0038" onclick="toggleCard('c0038')">
   <div class="card-title-row">
     <a href="https://github.com/huggingface/text-generation-webui" target="_blank" class="card-title-link" onclick="event.stopPropagation()">huggingface/text-generation-webui<strong style="font-size:.75rem;color:#64748b;margin-left:6px">text-generation-webui</strong></a>
-    <button class="expand-btn" id="btn-c0032">▼</button>
+    <button class="expand-btn" id="btn-c0038">▼</button>
   </div>
   <p class="card-desc-preview">📝 HuggingFace 文本生成Web界面，支持多种大模型</p>
   <div class="card-desc-full">
     <p>📝 HuggingFace 文本生成Web界面，支持多种大模型</p>
-    <span class="tag">HF</span><span class="tag">TextGen</span>
+    <span class="tag tag-purple">HF</span><span class="tag tag-purple">TextGen</span>
     <div class="meta-row">
       <span class="stars">14,000 ⭐/周</span>
       <span class="languages">Python</span>
     </div>
     <div style="margin-top:6px"><span class="audit-badge" style="background:#f59e0b22;border:1px solid #f59e0b44;color:#f59e0b">⚠️ MEDIUM</span><span class="audit-detail">Active</span></div>
   </div>
-</div><div class="expandable-card" id="card-c0033" onclick="toggleCard('c0033')">
+</div><div class="expandable-card" id="card-c0039" onclick="toggleCard('c0039')">
   <div class="card-title-row">
     <a href="https://github.com/huggingface/text-generation-webui" target="_blank" class="card-title-link" onclick="event.stopPropagation()">huggingface/text-generation-webui<strong style="font-size:.75rem;color:#64748b;margin-left:6px">text-generation-webui</strong></a>
-    <button class="expand-btn" id="btn-c0033">▼</button>
+    <button class="expand-btn" id="btn-c0039">▼</button>
   </div>
   <p class="card-desc-preview">📝 HuggingFace文本生成Web界面，支持多种大模型</p>
   <div class="card-desc-full">
     <p>📝 HuggingFace文本生成Web界面，支持多种大模型</p>
-    <span class="tag">HF</span><span class="tag">TextGen</span>
+    <span class="tag tag-purple">HF</span><span class="tag tag-purple">TextGen</span>
     <div class="meta-row">
       <span class="stars">14,000 ⭐/周</span>
       <span class="languages">Python</span>
     </div>
     <div style="margin-top:6px"><span class="audit-badge" style="background:#f59e0b22;border:1px solid #f59e0b44;color:#f59e0b">⚠️ MEDIUM</span><span class="audit-detail">Active</span></div>
   </div>
-</div><div class="expandable-card" id="card-c0034" onclick="toggleCard('c0034')">
+</div><div class="expandable-card" id="card-c0040" onclick="toggleCard('c0040')">
   <div class="card-title-row">
     <a href="https://github.com/cortexca/nexu" target="_blank" class="card-title-link" onclick="event.stopPropagation()">cortexca/nexu<strong style="font-size:.75rem;color:#64748b;margin-left:6px">nexu</strong></a>
-    <button class="expand-btn" id="btn-c0034">▼</button>
+    <button class="expand-btn" id="btn-c0040">▼</button>
   </div>
   <p class="card-desc-preview">🔮 Nexu AI 智能助手平台，一站式 AI 工具整合</p>
   <div class="card-desc-full">
     <p>🔮 Nexu AI 智能助手平台，一站式 AI 工具整合</p>
-    <span class="tag">AI</span><span class="tag">Platform</span>
+    <span class="tag tag-purple">AI</span><span class="tag tag-purple">Platform</span>
     <div class="meta-row">
       <span class="stars">12,000 ⭐/周</span>
       <span class="languages">Go</span>
@@ -610,151 +873,155 @@ border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#e2e8f0;padding:8
 </div></div>
 </div>
   <div class="section-block">
-  <h2 id="mcp">🔗 Model Context Protocol · 10个服务</h2>
-  <div class="card-grid"><div class="expandable-card" id="card-c0035" onclick="toggleCard('c0035')">
+  <div class="section-bar">
+    <span class="dot mc"></span>
+    <h2 id="mcp">Model Context Protocol</h2>
+    <span class="count">10 个服务</span>
+  </div>
+  <div class="card-grid"><div class="expandable-card" id="card-c0041" onclick="toggleCard('c0041')">
   <div class="card-title-row">
     <a href="https://github.com/anthropics/claude-code-mcp" target="_blank" class="card-title-link" onclick="event.stopPropagation()">anthropics/claude-code-mcp<strong style="font-size:.75rem;color:#64748b;margin-left:6px">claude-code-mcp</strong></a>
-    <button class="expand-btn" id="btn-c0035">▼</button>
+    <button class="expand-btn" id="btn-c0041">▼</button>
   </div>
   <p class="card-desc-preview">💻 Anthropic Claude Code MCP服务，终端编程代理的上下文协议接口</p>
   <div class="card-desc-full">
     <p>💻 Anthropic Claude Code MCP服务，终端编程代理的上下文协议接口</p>
-    <span class="tag">MCP</span><span class="tag">Anthropic</span>
+    <span class="tag tag-orange">MCP</span><span class="tag tag-orange">Anthropic</span>
     <div class="meta-row">
       <span class="stars">5,000 ⭐/周</span>
       <span class="languages">TypeScript</span>
     </div>
     
   </div>
-</div><div class="expandable-card" id="card-c0036" onclick="toggleCard('c0036')">
+</div><div class="expandable-card" id="card-c0042" onclick="toggleCard('c0042')">
   <div class="card-title-row">
     <a href="https://github.com/modelcontextprotocol/python-servers" target="_blank" class="card-title-link" onclick="event.stopPropagation()">modelcontextprotocol/python-servers<strong style="font-size:.75rem;color:#64748b;margin-left:6px">python-servers</strong></a>
-    <button class="expand-btn" id="btn-c0036">▼</button>
+    <button class="expand-btn" id="btn-c0042">▼</button>
   </div>
   <p class="card-desc-preview">🔌 Model Context Protocol Python SDK，核心MCP服务器实现</p>
   <div class="card-desc-full">
     <p>🔌 Model Context Protocol Python SDK，核心MCP服务器实现</p>
-    <span class="tag">MCP</span><span class="tag">Python</span>
+    <span class="tag tag-orange">MCP</span><span class="tag tag-orange">Python</span>
     <div class="meta-row">
       <span class="stars">8,000 ⭐/周</span>
       <span class="languages">Python</span>
     </div>
     
   </div>
-</div><div class="expandable-card" id="card-c0037" onclick="toggleCard('c0037')">
+</div><div class="expandable-card" id="card-c0043" onclick="toggleCard('c0043')">
   <div class="card-title-row">
     <a href="https://github.com/microsoft/playwright-mCP" target="_blank" class="card-title-link" onclick="event.stopPropagation()">microsoft/playwright-mcp<strong style="font-size:.75rem;color:#64748b;margin-left:6px">playwright-mcp</strong></a>
-    <button class="expand-btn" id="btn-c0037">▼</button>
+    <button class="expand-btn" id="btn-c0043">▼</button>
   </div>
   <p class="card-desc-preview">🌐 Microsoft Playwright浏览器自动化MCP服务</p>
   <div class="card-desc-full">
     <p>🌐 Microsoft Playwright浏览器自动化MCP服务</p>
-    <span class="tag">MCP</span><span class="tag">Playwright</span>
+    <span class="tag tag-orange">MCP</span><span class="tag tag-orange">Playwright</span>
     <div class="meta-row">
       <span class="stars">2,000 ⭐/周</span>
       <span class="languages">TypeScript</span>
     </div>
     
   </div>
-</div><div class="expandable-card" id="card-c0038" onclick="toggleCard('c0038')">
+</div><div class="expandable-card" id="card-c0044" onclick="toggleCard('c0044')">
   <div class="card-title-row">
     <a href="https://github.com/fireworks-ai/mcp-server-firecrawl" target="_blank" class="card-title-link" onclick="event.stopPropagation()">fireworks-ai/mcp-server-firecrawl<strong style="font-size:.75rem;color:#64748b;margin-left:6px">mcp-server-firecrawl</strong></a>
-    <button class="expand-btn" id="btn-c0038">▼</button>
+    <button class="expand-btn" id="btn-c0044">▼</button>
   </div>
   <p class="card-desc-preview">🕸️ Firecrawl Web爬取MCP服务，AI驱动的网页数据提取</p>
   <div class="card-desc-full">
     <p>🕸️ Firecrawl Web爬取MCP服务，AI驱动的网页数据提取</p>
-    <span class="tag">MCP</span><span class="tag">Web Scraping</span>
+    <span class="tag tag-orange">MCP</span><span class="tag tag-orange">Web Scraping</span>
     <div class="meta-row">
       <span class="stars">1,500 ⭐/周</span>
       <span class="languages">TypeScript</span>
     </div>
     
   </div>
-</div><div class="expandable-card" id="card-c0039" onclick="toggleCard('c0039')">
+</div><div class="expandable-card" id="card-c0045" onclick="toggleCard('c0045')">
   <div class="card-title-row">
     <a href="https://github.com/kristoff-a-i/screenshot-to-agent-mcp" target="_blank" class="card-title-link" onclick="event.stopPropagation()">kristoff-a-i/screenshot-to-agent-mcp<strong style="font-size:.75rem;color:#64748b;margin-left:6px">screenshot-to-agent-mcp</strong></a>
-    <button class="expand-btn" id="btn-c0039">▼</button>
+    <button class="expand-btn" id="btn-c0045">▼</button>
   </div>
   <p class="card-desc-preview">📸 截图到Agent MRP服务，将UI截图转化为可操作代码</p>
   <div class="card-desc-full">
     <p>📸 截图到Agent MRP服务，将UI截图转化为可操作代码</p>
-    <span class="tag">MCP</span><span class="tag">Vision</span>
+    <span class="tag tag-orange">MCP</span><span class="tag tag-orange">Vision</span>
     <div class="meta-row">
       <span class="stars">900 ⭐/周</span>
       <span class="languages">Python</span>
     </div>
     
   </div>
-</div><div class="expandable-card" id="card-c0040" onclick="toggleCard('c0040')">
+</div><div class="expandable-card" id="card-c0046" onclick="toggleCard('c0046')">
   <div class="card-title-row">
     <a href="https://github.com/lobehub/lobe-chat-mcp" target="_blank" class="card-title-link" onclick="event.stopPropagation()">lobehub/lobe-chat-mcp<strong style="font-size:.75rem;color:#64748b;margin-left:6px">lobe-chat-mcp</strong></a>
-    <button class="expand-btn" id="btn-c0040">▼</button>
+    <button class="expand-btn" id="btn-c0046">▼</button>
   </div>
   <p class="card-desc-preview">💬 LobeChat聊天机器人MCP集成服务</p>
   <div class="card-desc-full">
     <p>💬 LobeChat聊天机器人MCP集成服务</p>
-    <span class="tag">MCP</span><span class="tag">Chat</span>
+    <span class="tag tag-orange">MCP</span><span class="tag tag-orange">Chat</span>
     <div class="meta-row">
       <span class="stars">3,200 ⭐/周</span>
       <span class="languages">TypeScript</span>
     </div>
     
   </div>
-</div><div class="expandable-card" id="card-c0041" onclick="toggleCard('c0041')">
+</div><div class="expandable-card" id="card-c0047" onclick="toggleCard('c0047')">
   <div class="card-title-row">
     <a href="https://github.com/julep-ai/julep-mcp" target="_blank" class="card-title-link" onclick="event.stopPropagation()">julep-ai/julep-mcp<strong style="font-size:.75rem;color:#64748b;margin-left:6px">julep-mcp</strong></a>
-    <button class="expand-btn" id="btn-c0041">▼</button>
+    <button class="expand-btn" id="btn-c0047">▼</button>
   </div>
   <p class="card-desc-preview">🧠 Julep AI Agent框架MCP服务，构建智能对话代理</p>
   <div class="card-desc-full">
     <p>🧠 Julep AI Agent框架MCP服务，构建智能对话代理</p>
-    <span class="tag">MCP</span><span class="tag">Agent</span>
+    <span class="tag tag-orange">MCP</span><span class="tag tag-orange">Agent</span>
     <div class="meta-row">
       <span class="stars">700 ⭐/周</span>
       <span class="languages">Python</span>
     </div>
     
   </div>
-</div><div class="expandable-card" id="card-c0042" onclick="toggleCard('c0042')">
+</div><div class="expandable-card" id="card-c0048" onclick="toggleCard('c0048')">
   <div class="card-title-row">
     <a href="https://github.com/glific/twilio-whatsapp-mcp" target="_blank" class="card-title-link" onclick="event.stopPropagation()">glific/twilio-whatsapp-mcp<strong style="font-size:.75rem;color:#64748b;margin-left:6px">twilio-whatsapp-mcp</strong></a>
-    <button class="expand-btn" id="btn-c0042">▼</button>
+    <button class="expand-btn" id="btn-c0048">▼</button>
   </div>
   <p class="card-desc-preview">📱 WhatsApp消息集成MCP服务，企业级即时通讯AI助手</p>
   <div class="card-desc-full">
     <p>📱 WhatsApp消息集成MCP服务，企业级即时通讯AI助手</p>
-    <span class="tag">MCP</span><span class="tag">Messaging</span>
+    <span class="tag tag-orange">MCP</span><span class="tag tag-orange">Messaging</span>
     <div class="meta-row">
       <span class="stars">450 ⭐/周</span>
       <span class="languages">Python</span>
     </div>
     
   </div>
-</div><div class="expandable-card" id="card-c0043" onclick="toggleCard('c0043')">
+</div><div class="expandable-card" id="card-c0049" onclick="toggleCard('c0049')">
   <div class="card-title-row">
     <a href="https://github.com/Stitch/sql-mcp-server" target="_blank" class="card-title-link" onclick="event.stopPropagation()">Stitch/sql-mcp-server<strong style="font-size:.75rem;color:#64748b;margin-left:6px">sql-mcp-server</strong></a>
-    <button class="expand-btn" id="btn-c0043">▼</button>
+    <button class="expand-btn" id="btn-c0049">▼</button>
   </div>
   <p class="card-desc-preview">🗄️ SQL数据库查询MCP服务，自然语言转SQL的智能数据访问</p>
   <div class="card-desc-full">
     <p>🗄️ SQL数据库查询MCP服务，自然语言转SQL的智能数据访问</p>
-    <span class="tag">MCP</span><span class="tag">Database</span>
+    <span class="tag tag-orange">MCP</span><span class="tag tag-orange">Database</span>
     <div class="meta-row">
       <span class="stars">1,800 ⭐/周</span>
       <span class="languages">Go</span>
     </div>
     
   </div>
-</div><div class="expandable-card" id="card-c0044" onclick="toggleCard('c0044')">
+</div><div class="expandable-card" id="card-c0050" onclick="toggleCard('c0050')">
   <div class="card-title-row">
     <a href="https://github.com/stability-ai/stability-mcp" target="_blank" class="card-title-link" onclick="event.stopPropagation()">stability-ai/stability-mcp<strong style="font-size:.75rem;color:#64748b;margin-left:6px">stability-mcp</strong></a>
-    <button class="expand-btn" id="btn-c0044">▼</button>
+    <button class="expand-btn" id="btn-c0050">▼</button>
   </div>
   <p class="card-desc-preview">🎨 Stability AI图像生成MCP服务，文生图与图编辑接口</p>
   <div class="card-desc-full">
     <p>🎨 Stability AI图像生成MCP服务，文生图与图编辑接口</p>
-    <span class="tag">MCP</span><span class="tag">Image Gen</span>
+    <span class="tag tag-orange">MCP</span><span class="tag tag-orange">Image Gen</span>
     <div class="meta-row">
       <span class="stars">1,100 ⭐/周</span>
       <span class="languages">Python</span>
@@ -772,6 +1039,5 @@ border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#e2e8f0;padding:8
 
 <script>
 function toggleCard(id){var e=document.getElementById('expand-'+id);if(!e)return;e.classList.toggle('expanded');var b=document.querySelector('#btn-'+id);if(b)b.textContent=e.classList.contains('expanded')?'▲':'▼'}
-fetch('/list_archives.json').then(function(r){return r.json()}).then(function(archives){
-  var h='';archives.forEach(function(item){var url=item.url;var label=item.label||('第'+item.week+'周');var isActive=window.location.pathname===url?' style="color:#38bdf8;font-weight:600"':'';var s=item.stats||{};var gh=s.github||{};var pl=s.harness||{};var mc=s.mcp||{};var tags='';if(gh.count)tags+='<span class="arch-tag arch-gh">'+gh.count+'GitHub</span>';if(pl.count)tags+='<span class="arch-tag arch-pl">'+pl.count+'Harness</span>';if(mc.count)tags+='<span class="arch-tag arch-mc">'+mc.count+'MCP</span>';h+='<li><a href="'+url+'"'+isActive+'><span class="arch-label">'+label+'</span>'+tags+'</a></li>'});document.querySelector('.archive-list').innerHTML=h}).catch(function(e){console.warn('Archive load failed:',e)})
+  var h='';archives.forEach(function(item){var url=item.url;var label=item.label||('第'+item.week+'周');var isActive=window.location.pathname===url?' style="color:#38bdf8;font-weight:600"':'';var s=item.stats||{};var gh=s.github||{};var pl=s.harness||{};var mc=s.mcp||{};var tags='';if(gh.count)tags+='<span class="arch-tag arch-gh">'+gh.count+'GitHub</span>';if(pl.count)tags+='<span class="arch-tag arch-pl">'+pl.count+'Harness</span>';if(mc.count)tags+='<span class="arch-tag arch-mc">'+mc.count+'MCP</span>';h+='<li><a href="'+url+'"'+isActive+'><span class="arch-week">'+label+'</span><span class="arch-date">档案</span>'+tags+'</a></li>'});document.querySelector('.archive-list').innerHTML=h}).catch(function(e){console.warn('Archive load failed:',e)})
 </script></body></html>
