@@ -1,0 +1,20 @@
+[
+  {
+    "week": 36,
+    "label": "第36周(2026-09-01)",
+    "url": "/archive/week36_v5_20260901.json",
+    "desc": "GitHub20项 · Harness20项 · MCP10项",
+    "stats": {
+      "github": {
+        "count": 20,
+        "stars": 7630
+      },
+      "harness": {
+        "count": 20
+      },
+      "mcp": {
+        "count": 10
+      }
+    }
+  }
+]
